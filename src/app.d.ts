@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {
@@ -11,10 +13,18 @@ declare global {
 				COUNTER: DurableObjectNamespace;
 			};
 			context: {
-				waitUntil(promise: Promise<unknown>): void;
+				waitUntil(promise: Promise<any>): void;
 			};
 			caches: CacheStorage & { default: Cache };
 		}
+		interface Locals {
+			auth: import('lucia').AuthRequest;
+		}
+	}
+	namespace Lucia {
+		type Auth = import('$lib/server/lucia').Auth;
+		type DatabaseUserAttributes = {};
+		type DatabaseSessionAttributes = {};
 	}
 }
 
