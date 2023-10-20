@@ -13,7 +13,7 @@ async function main() {
 	);
 
 	console.log('Running migrations');
-	await migrate(db, { migrationsFolder: 'migrations' });
+	await migrate(db, { migrationsFolder: 'drizzle' });
 	console.log('Migrated successfully');
 	process.exit(0);
 }

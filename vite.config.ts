@@ -3,9 +3,15 @@ import { defineConfig } from 'vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 
 export default defineConfig({
+	server: {
+		port: 3000
+	},
 	plugins: [
 		sveltekit(),
 		SvelteKitPWA({
+			devOptions: {
+				enabled: true
+			},
 			registerType: 'autoUpdate',
 			includeAssets: ['logo.svg'],
 			manifest: {

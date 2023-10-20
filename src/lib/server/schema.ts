@@ -1,8 +1,9 @@
 import { sqliteTable, text, blob } from 'drizzle-orm/sqlite-core';
 
 export const user = sqliteTable('user', {
-	id: text('id').primaryKey()
+	id: text('id').primaryKey(),
 	// other user attributes
+	username: text('username').unique()
 });
 
 export const session = sqliteTable('user_session', {

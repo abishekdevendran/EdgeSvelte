@@ -1,6 +1,6 @@
 <script>
 	import '../app.postcss';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
+	import { Button, Navbar, NavBrand } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
 </script>
 
@@ -16,7 +16,10 @@
 			>VerbaTrack</span
 		>
 	</NavBrand>
-	<DarkMode />
+	<div class="flex gap-2 items-center justify-center">
+		<Button href="/auth/github">Github</Button>
+		<DarkMode />
+	</div>
 </Navbar>
 <div class="mt-16" />
 <slot />
