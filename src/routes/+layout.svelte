@@ -6,6 +6,7 @@
 
 <svelte:head>
 	<title>VerbaTrack</title>
+	<link rel="icon" type="image/svg" href="logo.svg" />
 </svelte:head>
 
 <Navbar class="px-2 sm:px-4 py-2.5 fixed w-full z-20 top-0 left-0 border-b">
@@ -17,5 +18,5 @@
 	</NavBrand>
 	<DarkMode />
 </Navbar>
-<div class="mt-16"/>
+<div class="mt-16" />
 <slot />

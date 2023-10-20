@@ -10,7 +10,8 @@
 		"sourceMap": true,
 		"strict": true,
 		"noUnusedLocals": false,
-		"noUnusedParameters": false
+		"noUnusedParameters": false,
+		"types": ["vite-plugin-pwa/client"]
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//
