@@ -3,7 +3,11 @@ import { sqliteTable, text, blob } from 'drizzle-orm/sqlite-core';
 export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
 	// other user attributes
-	username: text('username').unique()
+	github_username: text('github_username').unique(),
+	username: text('username').unique(),
+	name: text('name'),
+	email: text('email').unique(),
+	avatar: text('avatar')
 });
 
 export const session = sqliteTable('user_session', {

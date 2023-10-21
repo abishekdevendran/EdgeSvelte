@@ -1,9 +1,10 @@
-import { auth, githubAuth } from '$lib/server/lucia.js';
+import { db } from '$lib/server/db.js';
+import { auth, googleAuth } from '$lib/server/lucia.js';
 import { OAuthRequestError } from '@lucia-auth/oauth';
 
 export const GET = async ({ url, cookies, locals }) => {
-	console.log('github callback');
-	const storedState = cookies.get('github_oauth_state');
+	console.log('google callback');
+	const storedState = cookies.get('google_oauth_state');
 	const state = url.searchParams.get('state');
 	const code = url.searchParams.get('code');
 	// validate state
@@ -13,18 +14,31 @@ export const GET = async ({ url, cookies, locals }) => {
 		});
 	}
 	try {
-		const { getExistingUser, githubUser, createUser } = await githubAuth.validateCallback(code);
+		const { getExistingUser, googleUser, createUser, createKey } =
+			await googleAuth.validateCallback(code);
 
 		const getUser = async () => {
 			const existingUser = await getExistingUser();
 			if (existingUser) return existingUser;
+			if (googleUser.email_verified && googleUser.email) {
+				// check if user already exists with email
+				const existingDatabaseUserWithEmail = await db.query.user.findFirst({
+					where: (user, { eq }) => eq(user.email, googleUser.email!)
+				});
+				if (existingDatabaseUserWithEmail) {
+					// transform `UserSchema` to `User`
+					const user = auth.transformDatabaseUser(existingDatabaseUserWithEmail);
+					await createKey(user.userId);
+					return user;
+				}
+			}
 			const user = await createUser({
 				attributes: {
-					github_username: githubUser.login,
-					email: githubUser.email,
-					username: githubUser.login,
-					name: githubUser.name,
-					avatar: githubUser.avatar_url ?? null
+					email: googleUser.email ?? null,
+					username: null,
+					github_username: null,
+					name: googleUser.name,
+					avatar: googleUser.picture ?? null
 				}
 			});
 			return user;

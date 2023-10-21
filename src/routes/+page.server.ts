@@ -1,4 +1,5 @@
-import { redirect } from '@sveltejs/kit';
+import { auth } from '$lib/server/lucia.js';
+import { json, redirect } from '@sveltejs/kit';
 
 interface Resp {
 	userId: number;
@@ -18,3 +19,14 @@ export async function load({ locals }) {
 		resp: resp
 	};
 }
+
+export const actions = {
+	logout: async ({ locals }) => {
+		console.log('logout');
+		const session = await locals.auth.validate();
+		if (!session) return { error: 'Unauthorized' }
+		await auth.invalidateSession(session.sessionId);
+		locals.auth.setSession(null);
+		throw redirect(302, '/');
+	}
+};

@@ -1,14 +1,43 @@
 <script>
+	import { applyAction, enhance } from '$app/forms';
+	import { goto, invalidate } from '$app/navigation';
 	import '../app.postcss';
-	import { Button, Navbar, NavBrand } from 'flowbite-svelte';
+	import { Button, Navbar, NavBrand, Spinner } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
+	import { Toaster, toast } from 'svelte-sonner';
+
+	export let data;
+
+	let isLoggingOut = false;
+	const logoutHandler = async () => {
+		if (isLoggingOut) return;
+		isLoggingOut = true;
+		const res = await fetch('/auth/logout', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (res.ok) {
+			isLoggingOut = false;
+			invalidate('app:user');
+			return toast.success('Logged out successfully');
+		}
+		let resp = await res.json();
+		if (resp.error) {
+			toast.error(resp.error);
+		} else {
+			toast.error('Something went wrong');
+		}
+		isLoggingOut = false;
+	};
 </script>
 
 <svelte:head>
 	<title>VerbaTrack</title>
 	<link rel="icon" type="image/svg" href="logo.svg" />
 </svelte:head>
-
+<Toaster />
 <Navbar class="px-2 sm:px-4 py-2.5 fixed w-full z-20 top-0 left-0 border-b">
 	<NavBrand href="/">
 		<img src="logo.svg" class="mr-3 h-6 sm:h-9" alt="VerbaTrack Logo" />
@@ -17,7 +46,33 @@
 		>
 	</NavBrand>
 	<div class="flex gap-2 items-center justify-center">
-		<Button href="/auth/github">Github</Button>
+		{#if data.user}
+			<form
+				action="/?/logout"
+				method="POST"
+				use:enhance={() => {
+					isLoggingOut = true;
+					invalidate('app:user');
+					return async ({result}) => {
+						isLoggingOut = false;
+						if (result.type === 'redirect') {
+							goto(result.location);
+						} else {
+							await applyAction(result);
+						}
+					};
+				}}
+			>
+				<Button disabled={isLoggingOut} type="submit">
+					{#if isLoggingOut}
+						<Spinner class="mr-3" size="4" color="white" />
+					{/if}
+					Logout</Button
+				>
+			</form>
+		{:else}
+			<Button href="/auth/github">Github</Button>
+		{/if}
 		<DarkMode />
 	</div>
 </Navbar>
