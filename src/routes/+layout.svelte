@@ -1,12 +1,37 @@
-<script>
+<script lang="ts">
+	import { pwaInfo } from 'virtual:pwa-info';
 	import { applyAction, enhance } from '$app/forms';
 	import { goto, invalidate } from '$app/navigation';
 	import '../app.postcss';
 	import { Button, Navbar, NavBrand, Spinner } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
 	import { Toaster, toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
 
 	export let data;
+
+	onMount(async () => {
+		if (pwaInfo) {
+			const { registerSW } = await import('virtual:pwa-register');
+			registerSW({
+				immediate: true,
+				onRegistered(r) {
+					// uncomment following code if you want check for updates
+					// r && setInterval(() => {
+					//    console.log('Checking for sw update')
+					//    r.update()
+					// }, 20000 /* 20s for testing purposes */)
+					console.log(`SW Registered: ${r}`);
+				},
+				onRegisterError(error) {
+					console.log('SW registration error', error);
+				}
+			});
+		}
+	});
+
+	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 
 	let isLoggingOut = false;
 	const logoutHandler = async () => {
@@ -36,6 +61,7 @@
 <svelte:head>
 	<title>VerbaTrack</title>
 	<link rel="icon" type="image/svg" href="logo.svg" />
+	{@html webManifestLink}
 </svelte:head>
 <Toaster />
 <Navbar class="px-2 sm:px-4 py-2.5 fixed w-full z-20 top-0 left-0 border-b">
@@ -53,7 +79,7 @@
 				use:enhance={() => {
 					isLoggingOut = true;
 					invalidate('app:user');
-					return async ({result}) => {
+					return async ({ result }) => {
 						isLoggingOut = false;
 						if (result.type === 'redirect') {
 							goto(result.location);
@@ -77,4 +103,8 @@
 	</div>
 </Navbar>
 <div class="mt-16" />
-<slot />
+{#key data.url}
+	<div in:fly={{ x: -200, duration: 300, delay: 300 }} out:fly={{ x: -200, duration: 300 }}>
+		<slot />
+	</div>
+{/key}

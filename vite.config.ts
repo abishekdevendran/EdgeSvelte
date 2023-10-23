@@ -9,9 +9,6 @@ export default defineConfig({
 	plugins: [
 		sveltekit(),
 		SvelteKitPWA({
-			devOptions: {
-				enabled: true
-			},
 			registerType: 'autoUpdate',
 			includeAssets: ['logo.svg'],
 			manifest: {
